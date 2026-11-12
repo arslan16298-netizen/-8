@@ -1,0 +1,68 @@
+digraph classes {
+    rankdir=TB;
+    dpi=170;
+    nodesep=0.7;
+    ranksep=0.9;
+    node [fontname="DejaVu Sans", fontsize=13, shape=plaintext];
+    edge [fontname="DejaVu Sans", fontsize=12, color="#444444"];
+
+    SelfCheck [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#f4f4f4" COLOR="#666666">
+      <TR><TD ALIGN="CENTER"><B>SelfCheck</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">- SERVICE: BusinessTripService</TD></TR>
+      <TR><TD ALIGN="LEFT">- CSV_PATH: String</TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">+ main(args: String[]): void</TD></TR>
+      <TR><TD ALIGN="LEFT">- unitChecks(): void</TD></TR>
+      <TR><TD ALIGN="LEFT">- dataDriven(): void</TD></TR>
+      <TR><TD ALIGN="LEFT">- interactive(): void</TD></TR>
+    </TABLE>>];
+
+    BusinessTripService [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#e3f0ff" COLOR="#4a6fa5">
+      <TR><TD ALIGN="CENTER"><B>BusinessTripService</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">- trips: List&lt;BusinessTrip&gt;  {final}</TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">+ create(id: String, start: LocalDate, end: LocalDate): BusinessTrip</TD></TR>
+      <TR><TD ALIGN="LEFT">+ findByStatus(status: TripStatus): List&lt;BusinessTrip&gt;</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>+ addIsCancellable(trip: BusinessTrip): boolean</B>  // вариант 2, часть Б</TD></TR>
+    </TABLE>>];
+
+    BusinessTrip [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#e3f0ff" COLOR="#4a6fa5">
+      <TR><TD ALIGN="CENTER"><B>BusinessTrip</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">+ MIN_REASON_LENGTH: int = 10  {static final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- id: String  {final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- start: LocalDate  {final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- end: LocalDate  {final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- status: TripStatus</TD></TR>
+      <TR><TD ALIGN="LEFT">- rejectionReason: String</TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">+ BusinessTrip(id: String, start: LocalDate, end: LocalDate)</TD></TR>
+      <TR><TD ALIGN="LEFT">+ submit(): void</TD></TR>
+      <TR><TD ALIGN="LEFT">+ approve(): void</TD></TR>
+      <TR><TD ALIGN="LEFT">+ reject(reason: String): void</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>+ cancel(): void</B>  // часть А: только DRAFT, SUBMITTED</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>+ isCancellable(): boolean</B>  // правило отмены в одном месте</TD></TR>
+      <TR><TD ALIGN="LEFT">+ complete(today: LocalDate): void</TD></TR>
+      <TR><TD ALIGN="LEFT">+ complete(): void</TD></TR>
+      <TR><TD ALIGN="LEFT">- transitionError(target: TripStatus): IllegalStateException</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getId(): String   + getStart(): LocalDate   + getEnd(): LocalDate</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getStatus(): TripStatus   + getRejectionReason(): String</TD></TR>
+    </TABLE>>];
+
+    TripStatus [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#e8f0e0" COLOR="#5a7a3c">
+      <TR><TD ALIGN="CENTER">&lt;&lt;enumeration&gt;&gt;<BR/><B>TripStatus</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">DRAFT<BR ALIGN="LEFT"/>SUBMITTED<BR ALIGN="LEFT"/>APPROVED<BR ALIGN="LEFT"/>REJECTED<BR ALIGN="LEFT"/>CANCELLED<BR ALIGN="LEFT"/>COMPLETED<BR ALIGN="LEFT"/></TD></TR>
+    </TABLE>>];
+
+    SelfCheck -> BusinessTripService [label=" uses", style=dashed, arrowhead=open];
+    SelfCheck -> BusinessTrip [label=" tests", style=dashed, arrowhead=open];
+    BusinessTripService -> BusinessTrip [label=" 0..*  trips (creates)", arrowtail=diamond, dir=both, arrowhead=vee];
+    BusinessTrip -> TripStatus [label=" 1  status", style=dashed, arrowhead=open];
+}

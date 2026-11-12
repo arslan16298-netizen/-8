@@ -1,0 +1,30 @@
+digraph activity {
+    rankdir=TB;
+    dpi=170;
+    nodesep=0.45;
+    ranksep=0.42;
+    node [fontname="DejaVu Sans", fontsize=13, style="rounded,filled", shape=box, fillcolor="#e3f0ff", color="#4a6fa5", margin="0.18,0.1"];
+    edge [fontname="DejaVu Sans", fontsize=12, color="#444444"];
+
+    start [label="Начало", shape=ellipse, fillcolor="#e0f2d8", color="#5a9a3c"];
+    n1 [label="Получить команду пользователя\n(submit, approve, reject, cancel, complete)", shape=parallelogram, fillcolor="#e6e0f5", color="#7a64b0"];
+    n2 [label="Определить текущий статус заявки\n(поле status, начальное значение DRAFT)"];
+    a1 [label="A1: Проверить допустимость перехода из текущего статуса:\nsubmit — DRAFT; approve, reject — SUBMITTED;\ncancel — DRAFT или SUBMITTED (вариант 2); complete — APPROVED"];
+    d1 [label="Переход допустим?", shape=diamond, style=filled, fillcolor="#fff7c9", color="#b59a1e"];
+    a2 [label="A2: Проверить данные операции:\nreject — причина не короче 10 символов (R6);\ncomplete — сегодня не раньше даты end (R9)"];
+    d2 [label="Данные корректны?", shape=diamond, style=filled, fillcolor="#fff7c9", color="#b59a1e"];
+    ok [label="Изменить состояние заявки:\nstatus = новый статус\n(при reject сохранить rejectionReason)"];
+    e1 [label="Выбросить IllegalStateException\n«Ошибка перехода: X → Y недопустим»\n(статус не меняется)", fillcolor="#fde0e0", color="#c05050"];
+    e2 [label="Выбросить исключение с причиной:\nIllegalArgumentException (причина reject) или\nIllegalStateException (дата complete);\nстатус не меняется", fillcolor="#fde0e0", color="#c05050"];
+    end [label="Завершение", shape=ellipse, fillcolor="#ffe3cc", color="#d08040"];
+
+    start -> n1 -> n2 -> a1 -> d1;
+    d1 -> a2 [label=" да"];
+    d1 -> e1 [label=" нет"];
+    a2 -> d2;
+    d2 -> ok [label=" да"];
+    d2 -> e2 [label=" нет"];
+    ok -> end;
+    e1 -> end;
+    e2 -> end;
+}

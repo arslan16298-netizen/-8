@@ -1,0 +1,39 @@
+# sample.csv – контрольные значения ПР8 (вариант 2: cancel только из DRAFT и SUBMITTED)
+# Формат: id;start;end;action;expected
+# action: SUBMIT | APPROVE | REJECT[=причина] | CANCEL | COMPLETE[@yyyy-MM-dd]; несколько действий через запятую
+# expected: OK:status=X | ERROR:IllegalStateException | ERROR:IllegalArgumentException | SKIP:<причина ошибки конструктора>
+id;start;end;action;expected
+# === Корректные заявки: из DRAFT ===
+T-01;2026-10-10;2026-10-12;SUBMIT;OK:status=SUBMITTED
+T-02;2026-10-15;2026-10-20;SUBMIT;OK:status=SUBMITTED
+T-03;2026-10-01;2026-10-05;SUBMIT;OK:status=SUBMITTED
+T-04;2026-10-10;2026-10-10;SUBMIT;OK:status=SUBMITTED
+# === Ошибки конструктора: start > end, пустой id, формат даты ===
+T-05;2026-10-12;2026-10-10;SUBMIT;SKIP:start must be <= end
+;2026-10-10;2026-10-12;SUBMIT;SKIP:id is null or blank
+T-06;2026-13-10;2026-10-12;SUBMIT;SKIP:start is not a date
+T-07;2026-10-10;;SUBMIT;SKIP:end is not a date
+# === Действия из DRAFT ===
+T-08;2026-10-10;2026-10-12;APPROVE;ERROR:IllegalStateException
+T-09;2026-10-10;2026-10-12;REJECT;ERROR:IllegalStateException
+T-10;2026-10-10;2026-10-12;CANCEL;OK:status=CANCELLED
+T-11;2026-10-10;2026-10-12;COMPLETE;ERROR:IllegalStateException
+# === Цепочки переходов ===
+T-12;2026-10-10;2026-10-12;SUBMIT,APPROVE;OK:status=APPROVED
+T-13;2026-10-10;2026-10-12;SUBMIT,SUBMIT;ERROR:IllegalStateException
+T-14;2026-10-10;2026-10-12;SUBMIT,REJECT=Недостаточно бюджета;OK:status=REJECTED
+# === Граница причины: 10 символов допустимо, 9 нет ===
+T-15;2026-10-10;2026-10-12;SUBMIT,REJECT=1234567890;OK:status=REJECTED
+T-16;2026-10-10;2026-10-12;SUBMIT,REJECT=123456789;ERROR:IllegalArgumentException
+T-17;2026-10-10;2026-10-12;SUBMIT,REJECT;ERROR:IllegalArgumentException
+# === Граница даты завершения: today = end допустимо, end − 1 день нет ===
+T-18;2026-10-10;2026-10-12;SUBMIT,APPROVE,COMPLETE@2026-10-12;OK:status=COMPLETED
+T-19;2026-10-10;2026-10-12;SUBMIT,APPROVE,COMPLETE@2026-10-11;ERROR:IllegalStateException
+# === Терминальные состояния ===
+T-20;2026-10-10;2026-10-12;SUBMIT,REJECT=Недостаточно бюджета,SUBMIT;ERROR:IllegalStateException
+T-21;2026-10-10;2026-10-12;SUBMIT,APPROVE,COMPLETE@2026-10-12,CANCEL;ERROR:IllegalStateException
+# === Вариант 2, часть А: cancel из SUBMITTED можно, из APPROVED нельзя ===
+T-22;2026-10-10;2026-10-12;SUBMIT,CANCEL;OK:status=CANCELLED
+T-23;2026-10-10;2026-10-12;SUBMIT,APPROVE,CANCEL;ERROR:IllegalStateException
+T-24;2026-10-10;2026-10-12;CANCEL,CANCEL;ERROR:IllegalStateException
+T-25;2026-10-10;2026-10-12;SUBMIT,REJECT=Недостаточно бюджета,CANCEL;ERROR:IllegalStateException

@@ -1,0 +1,20 @@
+digraph states {
+    rankdir=LR;
+    dpi=170;
+    nodesep=0.6;
+    ranksep=0.9;
+    node [fontname="DejaVu Sans", fontsize=13, style="rounded,filled", shape=box, fillcolor="#e3f0ff", color="#4a6fa5", margin="0.2,0.12"];
+    edge [fontname="DejaVu Sans", fontsize=12, color="#444444"];
+    init [label="", shape=circle, width=0.2, fillcolor="#444444", color="#444444"];
+    DRAFT; SUBMITTED; APPROVED;
+    REJECTED [fillcolor="#fde0e0", color="#c05050", peripheries=2];
+    CANCELLED [fillcolor="#fde0e0", color="#c05050", peripheries=2];
+    COMPLETED [fillcolor="#e0f2d8", color="#5a9a3c", peripheries=2];
+    init -> DRAFT [label=" new BusinessTrip\n R1, R2"];
+    DRAFT -> SUBMITTED [label=" submit()\n R3, R4"];
+    SUBMITTED -> APPROVED [label=" approve()\n R5"];
+    SUBMITTED -> REJECTED [label=" reject(reason)\n R5, R6: ≥ 10 символов"];
+    APPROVED -> COMPLETED [label=" complete(today)\n R8, R9: today ≥ end"];
+    DRAFT -> CANCELLED [label=" cancel()\n R7"];
+    SUBMITTED -> CANCELLED [label=" cancel()\n R7"];
+}
